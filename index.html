@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">RED Assignment Tracker</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#courseMenu" aria-controls="courseMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hidden Container for Course Menu -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="courseMenu" aria-labelledby="courseMenuLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="courseMenuLabel">Courses</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <!-- Empty List Container -->
+        <ul class="list-group" id="courseList">
+            <!-- Dynamic course items will go here -->
+        </ul>
+
+        <!-- Add Course Trigger Button -->
+        <button class="btn btn-outline-primary w-100 mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#addCourseForm">
+            + Add Course
+        </button>
+
+        <!-- Collapsible Input Group -->
+        <div class="collapse mt-2" id="addCourseForm">
+            <div class="input-group">
+                <input type="text" class="form-control" id="courseInput" placeholder="Course name">
+                <button class="btn btn-success" type="button" id="saveCourseBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div> 
+
+<!-- Main Content Container -->
+<div class="container mt-4">
+    <h3>Upcoming Assignments</h3>
+    <hr>
+    <!-- Future assignment list will go here -->
+</div>
+
+<!-- Bootstrap JavaScript Engine -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom Course Management Logic with Persistence -->
+<script>
+    // --- 1. Element References ---
+    const saveCourseBtn = document.getElementById("saveCourseBtn");
+    const courseInput = document.getElementById("courseInput");
+    const courseList = document.getElementById("courseList");
+
+    // --- 2. Load Existing Data (The Source of Truth) ---
+    // If courses exist in localStorage, parse them back into an array. If not, start with an empty array.
+    const savedCourses = localStorage.getItem("courses");
+    let courses = savedCourses ? JSON.parse(savedCourses) : [];
+
+    // --- 3. The Visual Renderer ---
+    // Clears the existing HTML list and rebuilds it based on the courses array
+    function renderCourses() {
+        courseList.innerHTML = ""; // Wipe visual list clean to prevent duplicate entries
+
+        courses.forEach(function(courseName) {
+            const newCourseItem = document.createElement("li");
+            newCourseItem.className = "list-group-item";
+            newCourseItem.textContent = courseName;
+            courseList.appendChild(newCourseItem);
+        });
+    }
+
+    // --- 4. Initial Render ---
+    // Draw whatever was stored in memory as soon as the script loads
+    renderCourses();
+
+    // --- 5. Event: Adding a New Course ---
+    saveCourseBtn.addEventListener("click", function() {
+        const courseName = courseInput.value.trim();
+
+        if (courseName === "") {
+            return;
+        }
+
+        // Update the Source of Truth
+        courses.push(courseName);
+
+        // Save updated array to disk (localStorage)
+        localStorage.setItem("courses", JSON.stringify(courses));
+
+        // Re-render the visual list to show the new item
+        renderCourses();
+
+        // Clear the input field
+        courseInput.value = "";
+    });
+</script>
+
+</body>
+</html>
